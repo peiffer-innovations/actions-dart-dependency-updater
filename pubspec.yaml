@@ -1,26 +1,26 @@
-name: "dart_dependency_updater"
-description: "A package that will scan for dependencies in a Dart repo, update them if needed, and can update the repo with them."
-version: "1.0.7"
-homepage: "https://github.com/peiffer-innovations/action_dart_dependency_updater"
+name: 'dart_dependency_updater'
+description: 'A package that will scan for dependencies in a Dart repo, update them if needed, and can update the repo with them.'
+version: '1.0.7+1'
+homepage: 'https://github.com/peiffer-innovations/action_dart_dependency_updater'
 
-environment:
-  sdk: ">=2.17.0 <3.0.0"
+environment: 
+  sdk: '>=2.17.0 <3.0.0'
 
-dependencies:
-  args: "^2.3.1"
-  github: "^9.2.0"
-  http: "^0.13.4"
-  intl: "^0.17.0"
-  json_class: "^2.1.2+4"
-  logging: "^1.0.2"
-  meta: "^1.7.0"
-  pub_api_client: "^2.2.1"
-  pub_semver: "^2.1.1"
-  yaml: "^3.1.1"
-  yaml_writer: "^1.0.0"
+dependencies: 
+  args: '^2.3.1'
+  github: '^9.2.0'
+  http: '^0.13.4'
+  intl: '^0.17.0'
+  json_class: '^2.1.2+4'
+  logging: '^1.0.2'
+  meta: '^1.7.0'
+  pub_api_client: '^2.2.1'
+  pub_semver: '^2.1.1'
+  yaml: '^3.1.1'
+  yaml_writer: '^1.0.1'
 
-dev_dependencies:
-  test: "^1.21.1"
+dev_dependencies: 
+  test: '^1.21.1'
 
-ignore_updates:
-  - "meta"
+ignore_updates: 
+  - 'meta'
