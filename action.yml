@@ -22,9 +22,6 @@ inputs:
     description: "(Optional) Set to true to auto create a Pull Request with the updates, set to false to not create a PR"
     required: false
     default: "true"
-  repository:
-    description: The GitHub Owner/Repo repository name
-    required: true
   token:
     description: "Access token for the GH"
     required: true
@@ -56,8 +53,5 @@ runs:
       run: |
         set -e
 
-        echo "REPO: ${{ github.repository }}"
-        echo "REPO2: ${{ inputs.repository }}"
-
         dart pub global activate dart_dependency_updater
-        dart pub global run dart_dependency_updater:update --token ${{ inputs.token }} --message ${{ inputs.message }} --pull-request ${{ inputs.pull_request }} --merge ${{ inputs.merge }} --paths ${{ inputs.paths }} --repository ${{ inputs.repository }}
+        dart pub global run dart_dependency_updater:update --token ${{ inputs.token }} --message ${{ inputs.message }} --pull-request ${{ inputs.pull_request }} --merge ${{ inputs.merge }} --paths ${{ inputs.paths }} --repository ${{ github.repository }}
