@@ -424,14 +424,36 @@ ${logs.join('\n')}
               DateTime.now().millisecondsSinceEpoch + timeout.inMilliseconds;
           while (!merged) {
             await Future.delayed(const Duration(seconds: 30));
-            pr = await gh.pullRequests.get(slug, pr.number!);
 
-            if (pr.mergeable == true) {
+            print('Scanning for running status checks...');
+            var checks = await gh.checks.checkRuns
+                .listCheckRunsForRef(
+                  slug,
+                  ref: pr.head!.sha!,
+                )
+                .toList();
+
+            var done = true;
+            for (var check in checks) {
+              if (check.status?.value == 'in_progress') {
+                done = false;
+              }
+            }
+
+            if (done) {
+              print('Status checks complete...');
+              for (var check in checks) {
+                if (check.conclusion.value != 'success') {
+                  throw Exception('Status check(s) did not pass');
+                }
+              }
+
               var mergeResult = await gh.pullRequests.merge(
                 slug,
                 pr.number!,
                 message: 'Automated Merge',
               );
+
               if (mergeResult.merged != true) {
                 throw Exception('Error merging PR');
               }
