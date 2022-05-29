@@ -1,6 +1,6 @@
 # action_dart_dependency_updater
 
-Updates the dependencies of a Dart / Flutter repo automatically and optionally 
+Updates the dependencies of a Dart / Flutter repo automatically and optionally creates and merges the PR associated with the changes.
 
 ## Inputs
 
