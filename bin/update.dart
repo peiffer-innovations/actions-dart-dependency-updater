@@ -279,27 +279,35 @@ $cl
       }
 
       if (parsed['pull-request'] == 'true') {
-        var ghResult = Process.runSync(
-          'git',
-          ['remote', 'show', 'origin'],
-        );
-        var ghOutput = ghResult.stdout;
-
-        var regex = RegExp(
-          r'Push[^:]*:[^:]*:(?<org>[^\/]*)\/(?<repo>[^\n\.\/]*)',
-        );
-        var matches = regex.allMatches(ghOutput.toString());
         RepositorySlug? slug;
 
-        for (var match in matches) {
-          var org = match.namedGroup('org');
-          var repo = match.namedGroup('repo');
+        if (Platform.environment['GITHUB_ACTION_REPOSITORY'] != null) {
+          var repo = Platform.environment['GITHUB_ACTION_REPOSITORY']!;
 
-          if (org != null && repo != null) {
-            slug = RepositorySlug(org, repo);
+          slug = RepositorySlug.full(repo);
+          print('Discovered ENV SLUG: $repo');
+        } else {
+          var ghResult = Process.runSync(
+            'git',
+            ['remote', 'show', 'origin'],
+          );
+          var ghOutput = ghResult.stdout;
 
-            print('Discovered SLUG: $org/$repo');
-            break;
+          var regex = RegExp(
+            r'Push[^:]*:[^:]*:(?<org>[^\/]*)\/(?<repo>[^\n\.\/]*)',
+          );
+          var matches = regex.allMatches(ghOutput.toString());
+
+          for (var match in matches) {
+            var org = match.namedGroup('org');
+            var repo = match.namedGroup('repo');
+
+            if (org != null && repo != null) {
+              slug = RepositorySlug(org, repo);
+
+              print('Discovered SLUG: $org/$repo');
+              break;
+            }
           }
         }
 
@@ -309,7 +317,7 @@ $cl
 
         var branchName = 'dart_update_${DateTime.now().millisecondsSinceEpoch}';
 
-        ghResult = Process.runSync(
+        var ghResult = Process.runSync(
           'git',
           [
             'checkout',
