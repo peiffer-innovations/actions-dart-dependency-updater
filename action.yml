@@ -53,5 +53,5 @@ runs:
       run: |
         set -e
 
-        dart pub global activate https://github.com/peiffer-innovations/action-dart-dependency-updater
+        dart pub global activate dart_dependency_updater
         dart pub global run dart_dependency_updater:update --token ${{ inputs.token }} --message ${{ inputs.message }} --pull-request ${{ inputs.pull_request }} --merge ${{ inputs.merge }} --paths ${{ inputs.paths }}
