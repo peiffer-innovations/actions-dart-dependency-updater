@@ -53,6 +53,9 @@ Future<void> main(List<String>? args) async {
       defaultsTo: 'true',
     );
     parser.addOption(
+      'repository',
+    );
+    parser.addOption(
       'timeout',
       defaultsTo: '10',
     );
@@ -281,7 +284,14 @@ $cl
       if (parsed['pull-request'] == 'true') {
         RepositorySlug? slug;
 
-        if (Platform.environment['GITHUB_ACTION_REPOSITORY'] != null) {
+        if (parsed['repository'] != null) {
+          var repo = parsed['repository']!;
+
+          slug = RepositorySlug.full(repo);
+          print('Discovered CLI SLUG: $repo');
+        } else if (Platform
+                .environment['GITHUB_ACTION_REPOSITORY']?.isNotEmpty ==
+            true) {
           var repo = Platform.environment['GITHUB_ACTION_REPOSITORY']!;
 
           slug = RepositorySlug.full(repo);

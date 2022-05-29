@@ -53,5 +53,6 @@ runs:
       run: |
         set -e
 
+        echo "REPO: ${{ github.action_repository }}"
         dart pub global activate dart_dependency_updater
-        dart pub global run dart_dependency_updater:update --token ${{ inputs.token }} --message ${{ inputs.message }} --pull-request ${{ inputs.pull_request }} --merge ${{ inputs.merge }} --paths ${{ inputs.paths }}
+        dart pub global run dart_dependency_updater:update --token ${{ inputs.token }} --message ${{ inputs.message }} --pull-request ${{ inputs.pull_request }} --merge ${{ inputs.merge }} --paths ${{ inputs.paths }} --repository ${{ github.action_repository }}
