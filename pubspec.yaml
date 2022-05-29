@@ -17,7 +17,7 @@ dependencies:
   pub_api_client: "^2.2.1"
   pub_semver: "^2.1.1"
   yaml: "^3.1.1"
-  yaml_writer: "^1.0.1"
+  yaml_writer: "^1.0.0"
 
 dev_dependencies:
   test: "^1.21.1"
