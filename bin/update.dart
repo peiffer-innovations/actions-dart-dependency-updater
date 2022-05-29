@@ -297,6 +297,8 @@ $cl
 
           if (org != null && repo != null) {
             slug = RepositorySlug(org, repo);
+
+            print('Discovered SLUG: $org/$repo');
             break;
           }
         }
@@ -367,6 +369,12 @@ $cl
         var gh = GitHub(
           auth: Authentication.withToken(token),
         );
+
+        print('''
+Creating PR:
+  * From Branch: $branchName
+  * To Branch:   ${parsed['branch']}
+''');
         var pr = await gh.pullRequests.create(
           slug,
           CreatePullRequest(
@@ -380,6 +388,10 @@ ${logs.join('\n')}
 ''',
           ),
         );
+
+        if (pr.number == null) {
+          throw Exception(pr.toJson());
+        }
 
         print('Created PR: ${pr.htmlUrl}');
 
