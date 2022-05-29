@@ -1,3 +1,3 @@
-## [1.0.0] - May 29th, 2022
+## [1.0.0+1] - May 29th, 2022
 
 * Initial release

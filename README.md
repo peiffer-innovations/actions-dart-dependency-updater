@@ -29,7 +29,7 @@ jobs:
 
     steps:
       - name: Dependencies
-        uses: peiffer-innovations/actions-dart-dependency-updater@v1
+        uses: peiffer-innovations/action-dart-dependency-updater@v1.0.1
         with:
           merge: true
           pull_request: true
