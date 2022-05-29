@@ -11,6 +11,7 @@ Name           | Default    | Description
 `paths`        | `.`      | (Optional) Comma delimited list of paths
 `merge`        | `true`     | (Optional) Set to `true` to automatically merge the PR when status checks pass, set to `false` otherwise
 `pull_request` | `true`     | (Optional) Set to `true` to automatically create a pull request when paths change, set to `false` otherwise
+`repository`   | n/a        | The `owner/repo` GitHub repository combination
 `token`        | n/a        | Access token for GH.  Typically: `${{ secrets.GITHUB_TOKEN }}`
 
 
@@ -29,10 +30,11 @@ jobs:
 
     steps:
       - name: Dependencies
-        uses: peiffer-innovations/action-dart-dependency-updater@v1.0.3
+        uses: peiffer-innovations/action-dart-dependency-updater@v1.0.5
         with:
           merge: true
           pull_request: true
+          repository: ${{ github.action_repository }}
           token: ${{ secrets.GITHUB_TOKEN }}
 ```
 

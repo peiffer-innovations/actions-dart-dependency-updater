@@ -10,8 +10,9 @@ jobs:
 
     steps:
       - name: Dependencies
-        uses: peiffer-innovations/action-dart-dependency-updater@v1.0.4
+        uses: peiffer-innovations/action-dart-dependency-updater@v1.0.5
         with:
           merge: true
           pull_request: true
+          repository: ${{ github.action_repository }}
           token: ${{ secrets.REPO_TOKEN }}
