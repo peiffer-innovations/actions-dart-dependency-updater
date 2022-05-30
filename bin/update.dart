@@ -309,7 +309,7 @@ Future<bool> _updateDependencies({
   required String path,
   required Duration timeout,
 }) async {
-  var hasUpdates = true;
+  var hasUpdates = false;
   var scanner = VersionScanner();
   var pubspec = File('$path/pubspec.yaml');
 
@@ -411,6 +411,9 @@ $cl
         }
       }
     }
+
+    line = line.replaceAll(": '", ': "');
+    line = line.replaceAll("'\n", '"\n');
 
     output.add(line);
   }
