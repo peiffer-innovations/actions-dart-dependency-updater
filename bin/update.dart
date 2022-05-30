@@ -484,38 +484,6 @@ $cl
     ]);
 
     if (processResult.exitCode == 0) {
-      if (flutter) {
-        processResult = Process.runSync(
-          'flutter',
-          ['analyze'],
-          workingDirectory: path,
-        );
-      } else {
-        processResult = Process.runSync(
-          'dart',
-          ['analyze'],
-          workingDirectory: path,
-        );
-      }
-    }
-
-    if (processResult.exitCode == 0 && Directory('$path/test').existsSync()) {
-      if (flutter) {
-        processResult = Process.runSync(
-          'flutter',
-          ['test'],
-          workingDirectory: path,
-        );
-      } else {
-        processResult = Process.runSync(
-          'dart',
-          ['test'],
-          workingDirectory: path,
-        );
-      }
-    }
-
-    if (processResult.exitCode == 0) {
       logs.add('');
       logs.add('Analysis Successful');
     } else {
