@@ -231,7 +231,7 @@ Future<void> _processGit({
     print('''
 Creating PR:
   * From Branch: $branchName
-  * To Branch:   $branch}
+  * To Branch:   $branch
 ''');
     var pr = await gh.pullRequests.create(
       slug,
@@ -308,9 +308,9 @@ ${logs.join('\n')}
             branchName,
           ]);
         } else if (DateTime.now().millisecondsSinceEpoch > endBy) {
-          throw Exception('PR Timeout!!!');
+          throw Exception('Status Check Timeout!!!');
         } else {
-          print('PR not mergable, waiting...');
+          print('Status check running, waiting...');
         }
       }
     }
