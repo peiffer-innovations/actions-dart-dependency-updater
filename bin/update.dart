@@ -499,7 +499,7 @@ $cl
       }
     }
 
-    if (processResult.exitCode == 0) {
+    if (processResult.exitCode == 0 && Directory('$path/test').existsSync()) {
       if (flutter) {
         processResult = Process.runSync(
           'flutter',
