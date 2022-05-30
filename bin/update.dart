@@ -79,12 +79,19 @@ Future<void> main(List<String>? args) async {
           ) ||
           hasUpdates;
     }
-    if (hasUpdates && parsed['dry-run'] != true) {
-      await _processGit(
-        logs: logs,
-        parsed: parsed,
-        timeout: timeout,
-      );
+    if (hasUpdates) {
+      if (parsed['dry-run'] != true) {
+        await _processGit(
+          logs: logs,
+          parsed: parsed,
+          timeout: timeout,
+        );
+        logs.add('Process is complete');
+      } else {
+        logs.add('Dry run requested, process is complete');
+      }
+    } else {
+      logs.add('No updates found, process is complete');
     }
     print(logs.join('\n'));
     exit(exitCode);
