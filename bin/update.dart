@@ -42,7 +42,6 @@ Future<void> main(List<String>? args) async {
     );
     parser.addOption(
       'message',
-      defaultsTo: 'Automated dependency update',
     );
     parser.addOption(
       'paths',
