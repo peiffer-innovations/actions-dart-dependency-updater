@@ -71,8 +71,11 @@ Future<void> main(List<String>? args) async {
     var timeout = Duration(
       minutes: JsonClass.parseInt(parsed['timeout']) ?? 10,
     );
+    var dryRun = parsed['dry-run'] == true;
+
     for (var path in paths) {
       hasUpdates = await _updateDependencies(
+            dryRun: dryRun,
             logs: logs,
             path: path,
             timeout: timeout,
@@ -82,9 +85,15 @@ Future<void> main(List<String>? args) async {
     if (hasUpdates) {
       if (parsed['dry-run'] != true) {
         await _processGit(
+          branch: parsed['branch'],
+          dryRun: dryRun,
           logs: logs,
-          parsed: parsed,
+          merge: parsed['merge'] == 'true',
+          message: parsed['message'],
+          pullRequest: parsed['pull-request'] == 'true',
+          repository: parsed['repository'],
           timeout: timeout,
+          token: parsed['token'],
         );
         logs.add('Process is complete');
       } else {
@@ -105,15 +114,21 @@ Future<void> main(List<String>? args) async {
 }
 
 Future<void> _processGit({
+  required String branch,
+  required bool dryRun,
   required List<String> logs,
-  required ArgResults parsed,
+  required bool merge,
+  required String? message,
+  required bool pullRequest,
+  required String? repository,
   required Duration timeout,
+  required String? token,
 }) async {
-  if (parsed['pull-request'] == 'true') {
+  if (pullRequest) {
     RepositorySlug? slug;
 
-    if (parsed['repository'] != null) {
-      var repo = parsed['repository']!;
+    if (repository != null) {
+      var repo = repository;
 
       slug = RepositorySlug.full(repo);
       print('Discovered CLI SLUG: $repo');
@@ -183,8 +198,7 @@ Future<void> _processGit({
       [
         'commit',
         '-m',
-        parsed['message'] ??
-            'action-dart-dependency-updater: updating dependencies',
+        message ?? 'action-dart-dependency-updater: updating dependencies',
       ],
     );
     if (ghResult.exitCode != 0) {
@@ -206,7 +220,6 @@ Future<void> _processGit({
 
     print('Pushed to: $branchName');
 
-    var token = parsed['token'];
     if (token == null) {
       throw Exception('FormatException: Option token is mandatory.');
     }
@@ -218,14 +231,14 @@ Future<void> _processGit({
     print('''
 Creating PR:
   * From Branch: $branchName
-  * To Branch:   ${parsed['branch']}
+  * To Branch:   $branch}
 ''');
     var pr = await gh.pullRequests.create(
       slug,
       CreatePullRequest(
         'BOT: Dart Dependency Updater',
         branchName,
-        parsed['branch'],
+        branch,
         body: '''
 PR created automatically via: https://github.com/peiffer-innovations/action-dart-dependency-updater
 
@@ -243,7 +256,7 @@ ${logs.join('\n')}
     if (exitCode != 0) {
       logs.add('');
       logs.add('Analysis failed!');
-    } else if (parsed['merge'] == 'true') {
+    } else if (merge) {
       print('Preparing to merge PR...');
       var merged = false;
 
@@ -305,6 +318,7 @@ ${logs.join('\n')}
 }
 
 Future<bool> _updateDependencies({
+  required bool dryRun,
   required List<String> logs,
   required String path,
   required Duration timeout,

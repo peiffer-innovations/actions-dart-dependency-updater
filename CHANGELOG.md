@@ -1,4 +1,4 @@
-## [1.0.12] - May, 30th, 2022
+## [1.0.13] - May, 30th, 2022
 
 * Bug fix for when there are no changes
 
