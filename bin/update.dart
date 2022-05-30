@@ -198,7 +198,7 @@ Future<void> _processGit({
       [
         'commit',
         '-m',
-        message ?? 'action-dart-dependency-updater: updating dependencies',
+        message ?? 'actions-dart-dependency-updater: updating dependencies',
       ],
     );
     if (ghResult.exitCode != 0) {
@@ -240,7 +240,7 @@ Creating PR:
         branchName,
         branch,
         body: '''
-PR created automatically via: https://github.com/peiffer-innovations/action-dart-dependency-updater
+PR created automatically via: https://github.com/peiffer-innovations/actions-dart-dependency-updater
 
 ${logs.join('\n')}
 ''',

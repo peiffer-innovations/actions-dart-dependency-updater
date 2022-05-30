@@ -1,4 +1,4 @@
-# action_dart_dependency_updater
+# actions_dart_dependency_updater
 
 Updates the dependencies of a Dart / Flutter repo automatically and optionally creates and merges the PR associated with the changes.
 
@@ -29,7 +29,7 @@ jobs:
 
     steps:
       - name: Dependencies
-        uses: peiffer-innovations/actions-dart-dependency-updater@v1.0.14
+        uses: peiffer-innovations/actions-dart-dependency-updater@v1.0.15
         with:
           merge: true
           pull_request: true
