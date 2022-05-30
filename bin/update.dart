@@ -339,31 +339,32 @@ Future<bool> _updateDependencies({
     }
   }
 
-  var contents = Map<String, dynamic>.from(yaml.contents.value);
-  var version = Version.parse(contents['version']);
+  if (hasUpdates) {
+    var contents = Map<String, dynamic>.from(yaml.contents.value);
+    var version = Version.parse(contents['version']);
 
-  if (version.build.length > 1) {
-    throw Exception(
-      'Unable to process pubspec version: ${contents['version']}',
-    );
-  }
+    if (version.build.length > 1) {
+      throw Exception(
+        'Unable to process pubspec version: ${contents['version']}',
+      );
+    }
 
-  var buildNumber = 0;
-  if (version.build.isNotEmpty) {
-    buildNumber = JsonClass.parseInt(version.build.first) ?? 0;
-  }
-  buildNumber++;
+    var buildNumber = 0;
+    if (version.build.isNotEmpty) {
+      buildNumber = JsonClass.parseInt(version.build.first) ?? 0;
+    }
+    buildNumber++;
 
-  var versionString =
-      '${version.major}.${version.minor}.${version.patch}+$buildNumber';
-  contents['version'] = versionString;
+    var versionString =
+        '${version.major}.${version.minor}.${version.patch}+$buildNumber';
+    contents['version'] = versionString;
 
-  var changelog = File('$path/CHANGELOG.md');
-  if (changelog.existsSync()) {
-    var cl = changelog.readAsStringSync();
-    var df = DateFormat('MMMM, d, yyyy');
+    var changelog = File('$path/CHANGELOG.md');
+    if (changelog.existsSync()) {
+      var cl = changelog.readAsStringSync();
+      var df = DateFormat('MMMM, d, yyyy');
 
-    cl = '''
+      cl = '''
 ## [$versionString] - ${df.format(DateTime.now())}
 
 * Automated dependency updates
@@ -372,152 +373,149 @@ Future<bool> _updateDependencies({
 $cl
 ''';
 
-    changelog.writeAsStringSync(cl);
-  }
-
-  var flutter = false;
-
-  if (results.dependencies.isNotEmpty) {
-    var deps = Map<String, dynamic>.from(contents['dependencies']);
-    flutter = flutter || deps.containsKey('flutter');
-    for (var dep in results.dependencies) {
-      deps[dep.package] = '^${dep.newVersion}';
+      changelog.writeAsStringSync(cl);
     }
-    contents['dependencies'] = deps;
-  }
 
-  if (results.devDependencies.isNotEmpty) {
-    var deps = Map<String, dynamic>.from(contents['dev_dependencies']);
-    flutter = flutter || deps.containsKey('flutter');
-    flutter = flutter || deps.containsKey('flutter_test');
-    for (var dep in results.devDependencies) {
-      deps[dep.package] = '^${dep.newVersion}';
+    var flutter = false;
+
+    if (results.dependencies.isNotEmpty) {
+      var deps = Map<String, dynamic>.from(contents['dependencies']);
+      flutter = flutter || deps.containsKey('flutter');
+      for (var dep in results.dependencies) {
+        deps[dep.package] = '^${dep.newVersion}';
+      }
+      contents['dependencies'] = deps;
     }
-    contents['dev_dependencies'] = deps;
-  }
-  logs.add('');
 
-  var lines = YAMLWriter().write(contents).split('\n');
+    if (results.devDependencies.isNotEmpty) {
+      var deps = Map<String, dynamic>.from(contents['dev_dependencies']);
+      flutter = flutter || deps.containsKey('flutter');
+      flutter = flutter || deps.containsKey('flutter_test');
+      for (var dep in results.devDependencies) {
+        deps[dep.package] = '^${dep.newVersion}';
+      }
+      contents['dev_dependencies'] = deps;
+    }
+    logs.add('');
 
-  var output = <String>[];
-  for (var i = 0; i < lines.length; i++) {
-    var line = lines[i];
-    if (line.trim().isNotEmpty) {
-      if (!line.startsWith(' ')) {
-        var nextLine = i + 1 < lines.length ? lines[i + 1] : '';
+    var lines = YAMLWriter().write(contents).split('\n');
 
-        if (nextLine.startsWith(' ')) {
-          output.add('');
+    var output = <String>[];
+    for (var i = 0; i < lines.length; i++) {
+      var line = lines[i];
+      if (line.trim().isNotEmpty) {
+        if (!line.startsWith(' ')) {
+          var nextLine = i + 1 < lines.length ? lines[i + 1] : '';
+
+          if (nextLine.startsWith(' ')) {
+            output.add('');
+          }
         }
+      }
+
+      output.add(line);
+    }
+
+    pubspec.writeAsStringSync(output.join('\n'));
+
+    Future<ProcessResult> process;
+    var lock = File('$path/pubspec.lock');
+    if (lock.existsSync()) {
+      lock.deleteSync();
+    }
+
+    if (flutter) {
+      print('Updating Flutter packages...');
+      process = Process.run(
+        'flutter',
+        ['packages', 'get'],
+        workingDirectory: path,
+      );
+    } else {
+      print('Updating Dart packages...');
+      process = Process.run(
+        'dart',
+        ['pub', 'get'],
+        workingDirectory: path,
+      );
+    }
+
+    Completer? completer = Completer();
+    var cFuture = completer.future;
+    late ProcessResult processResult;
+    var timer = Timer(
+      timeout,
+      () {
+        print('TIMEOUT!');
+        completer?.completeError('TIMEOUT!');
+        completer = null;
+      },
+    );
+    var future = Future.microtask(() async {
+      try {
+        processResult = await process;
+        print('Done updating dependencies');
+        completer?.complete();
+      } catch (e, stack) {
+        completer?.completeError(e, stack);
+      } finally {
+        timer.cancel();
+        completer = null;
+      }
+    });
+
+    await Future.wait([
+      future,
+      cFuture,
+    ]);
+
+    if (processResult.exitCode == 0) {
+      if (flutter) {
+        processResult = Process.runSync(
+          'flutter',
+          ['analyze'],
+          workingDirectory: path,
+        );
+      } else {
+        processResult = Process.runSync(
+          'dart',
+          ['analyze'],
+          workingDirectory: path,
+        );
       }
     }
 
-    line = line.replaceAll(": '", ': "');
-    line = line.replaceAll("'\n", '"\n');
-
-    output.add(line);
-  }
-
-  pubspec.writeAsStringSync(output.join('\n'));
-
-  Future<ProcessResult> process;
-  var lock = File('$path/pubspec.lock');
-  if (lock.existsSync()) {
-    lock.deleteSync();
-  }
-
-  if (flutter) {
-    print('Updating Flutter packages...');
-    process = Process.run(
-      'flutter',
-      ['packages', 'get'],
-      workingDirectory: path,
-    );
-  } else {
-    print('Updating Dart packages...');
-    process = Process.run(
-      'dart',
-      ['pub', 'get'],
-      workingDirectory: path,
-    );
-  }
-
-  Completer? completer = Completer();
-  var cFuture = completer.future;
-  late ProcessResult processResult;
-  var timer = Timer(
-    timeout,
-    () {
-      print('TIMEOUT!');
-      completer?.completeError('TIMEOUT!');
-      completer = null;
-    },
-  );
-  var future = Future.microtask(() async {
-    try {
-      processResult = await process;
-      print('Done updating dependencies');
-      completer?.complete();
-    } catch (e, stack) {
-      completer?.completeError(e, stack);
-    } finally {
-      timer.cancel();
-      completer = null;
+    if (processResult.exitCode == 0) {
+      if (flutter) {
+        processResult = Process.runSync(
+          'flutter',
+          ['test'],
+          workingDirectory: path,
+        );
+      } else {
+        processResult = Process.runSync(
+          'dart',
+          ['test'],
+          workingDirectory: path,
+        );
+      }
     }
-  });
 
-  await Future.wait([
-    future,
-    cFuture,
-  ]);
-
-  if (processResult.exitCode == 0) {
-    if (flutter) {
-      processResult = Process.runSync(
-        'flutter',
-        ['analyze'],
-        workingDirectory: path,
-      );
+    if (processResult.exitCode == 0) {
+      logs.add('');
+      logs.add('Analysis Successful');
     } else {
-      processResult = Process.runSync(
-        'dart',
-        ['analyze'],
-        workingDirectory: path,
-      );
+      logs.add('');
+      logs.add('Error!!!');
+      logs.add('```');
+      logs.add(processResult.stdout);
+
+      logs.add('');
+      logs.add(processResult.stderr);
+      logs.add('```');
+      exitCode = processResult.exitCode;
     }
   }
-
-  if (processResult.exitCode == 0) {
-    if (flutter) {
-      processResult = Process.runSync(
-        'flutter',
-        ['test'],
-        workingDirectory: path,
-      );
-    } else {
-      processResult = Process.runSync(
-        'dart',
-        ['test'],
-        workingDirectory: path,
-      );
-    }
-  }
-
-  if (processResult.exitCode == 0) {
-    logs.add('');
-    logs.add('Analysis Successful');
-  } else {
-    logs.add('');
-    logs.add('Error!!!');
-    logs.add('```');
-    logs.add(processResult.stdout);
-
-    logs.add('');
-    logs.add(processResult.stderr);
-    logs.add('```');
-    exitCode = processResult.exitCode;
-  }
-
   logs.add('');
 
   return hasUpdates;
