@@ -279,198 +279,199 @@ $cl
           logs.add('```');
           exitCode = processResult.exitCode;
         }
-      }
 
-      if (parsed['pull-request'] == 'true') {
-        RepositorySlug? slug;
+        if (parsed['pull-request'] == 'true') {
+          RepositorySlug? slug;
 
-        if (parsed['repository'] != null) {
-          var repo = parsed['repository']!;
+          if (parsed['repository'] != null) {
+            var repo = parsed['repository']!;
 
-          slug = RepositorySlug.full(repo);
-          print('Discovered CLI SLUG: $repo');
-        } else if (Platform
-                .environment['GITHUB_ACTION_REPOSITORY']?.isNotEmpty ==
-            true) {
-          var repo = Platform.environment['GITHUB_ACTION_REPOSITORY']!;
+            slug = RepositorySlug.full(repo);
+            print('Discovered CLI SLUG: $repo');
+          } else if (Platform
+                  .environment['GITHUB_ACTION_REPOSITORY']?.isNotEmpty ==
+              true) {
+            var repo = Platform.environment['GITHUB_ACTION_REPOSITORY']!;
 
-          slug = RepositorySlug.full(repo);
-          print('Discovered ENV SLUG: $repo');
-        } else {
-          var ghResult = Process.runSync(
-            'git',
-            ['remote', 'show', 'origin'],
-          );
-          var ghOutput = ghResult.stdout;
+            slug = RepositorySlug.full(repo);
+            print('Discovered ENV SLUG: $repo');
+          } else {
+            var ghResult = Process.runSync(
+              'git',
+              ['remote', 'show', 'origin'],
+            );
+            var ghOutput = ghResult.stdout;
 
-          var regex = RegExp(
-            r'Push[^:]*:[^:]*:(?<org>[^\/]*)\/(?<repo>[^\n\.\/]*)',
-          );
-          var matches = regex.allMatches(ghOutput.toString());
+            var regex = RegExp(
+              r'Push[^:]*:[^:]*:(?<org>[^\/]*)\/(?<repo>[^\n\.\/]*)',
+            );
+            var matches = regex.allMatches(ghOutput.toString());
 
-          for (var match in matches) {
-            var org = match.namedGroup('org');
-            var repo = match.namedGroup('repo');
+            for (var match in matches) {
+              var org = match.namedGroup('org');
+              var repo = match.namedGroup('repo');
 
-            if (org != null && repo != null) {
-              slug = RepositorySlug(org, repo);
+              if (org != null && repo != null) {
+                slug = RepositorySlug(org, repo);
 
-              print('Discovered SLUG: $org/$repo');
-              break;
+                print('Discovered SLUG: $org/$repo');
+                break;
+              }
             }
           }
-        }
 
-        if (slug == null) {
-          throw Exception('Unable to determine GitHub SLUG');
-        }
+          if (slug == null) {
+            throw Exception('Unable to determine GitHub SLUG');
+          }
 
-        var branchName = 'dart_update_${DateTime.now().millisecondsSinceEpoch}';
+          var branchName =
+              'dart_update_${DateTime.now().millisecondsSinceEpoch}';
 
-        var ghResult = Process.runSync(
-          'git',
-          [
-            'checkout',
-            '-b',
-            branchName,
-          ],
-        );
-        if (ghResult.exitCode != 0) {
-          throw Exception('Unable to create branch.');
-        }
-        print('Created branch: $branchName');
+          var ghResult = Process.runSync(
+            'git',
+            [
+              'checkout',
+              '-b',
+              branchName,
+            ],
+          );
+          if (ghResult.exitCode != 0) {
+            throw Exception('Unable to create branch.');
+          }
+          print('Created branch: $branchName');
 
-        ghResult = Process.runSync(
-          'git',
-          [
-            'add',
-            '.',
-          ],
-        );
-        if (ghResult.exitCode != 0) {
-          throw Exception('Unable to add to GitHub.');
-        }
+          ghResult = Process.runSync(
+            'git',
+            [
+              'add',
+              '.',
+            ],
+          );
+          if (ghResult.exitCode != 0) {
+            throw Exception('Unable to add to GitHub.');
+          }
 
-        ghResult = Process.runSync(
-          'git',
-          [
-            'commit',
-            '-m',
-            parsed['message'] ??
-                'action-dart-dependency-updater: updating dependencies',
-          ],
-        );
-        if (ghResult.exitCode != 0) {
-          throw Exception('Unable to commit to GitHub.');
-        }
+          ghResult = Process.runSync(
+            'git',
+            [
+              'commit',
+              '-m',
+              parsed['message'] ??
+                  'action-dart-dependency-updater: updating dependencies',
+            ],
+          );
+          if (ghResult.exitCode != 0) {
+            throw Exception('Unable to commit to GitHub.');
+          }
 
-        ghResult = Process.runSync(
-          'git',
-          [
-            'push',
-            '--set-upstream',
-            'origin',
-            branchName,
-          ],
-        );
-        if (ghResult.exitCode != 0) {
-          throw Exception('Unable to push to GitHub.');
-        }
+          ghResult = Process.runSync(
+            'git',
+            [
+              'push',
+              '--set-upstream',
+              'origin',
+              branchName,
+            ],
+          );
+          if (ghResult.exitCode != 0) {
+            throw Exception('Unable to push to GitHub.');
+          }
 
-        print('Pushed to: $branchName');
+          print('Pushed to: $branchName');
 
-        var token = parsed['token'];
-        if (token == null) {
-          throw Exception('FormatException: Option token is mandatory.');
-        }
+          var token = parsed['token'];
+          if (token == null) {
+            throw Exception('FormatException: Option token is mandatory.');
+          }
 
-        var gh = GitHub(
-          auth: Authentication.withToken(token),
-        );
+          var gh = GitHub(
+            auth: Authentication.withToken(token),
+          );
 
-        print('''
+          print('''
 Creating PR:
   * From Branch: $branchName
   * To Branch:   ${parsed['branch']}
 ''');
-        var pr = await gh.pullRequests.create(
-          slug,
-          CreatePullRequest(
-            'BOT: Dart Dependency Updater',
-            branchName,
-            parsed['branch'],
-            body: '''
+          var pr = await gh.pullRequests.create(
+            slug,
+            CreatePullRequest(
+              'BOT: Dart Dependency Updater',
+              branchName,
+              parsed['branch'],
+              body: '''
 PR created automatically via: https://github.com/peiffer-innovations/action-dart-dependency-updater
 
 ${logs.join('\n')}
 ''',
-          ),
-        );
+            ),
+          );
 
-        if (pr.number == null) {
-          throw Exception(pr.toJson());
-        }
+          if (pr.number == null) {
+            throw Exception(pr.toJson());
+          }
 
-        print('Created PR: ${pr.htmlUrl}');
+          print('Created PR: ${pr.htmlUrl}');
 
-        if (exitCode != 0) {
-          logs.add('');
-          logs.add('Analysis failed!');
-        } else if (parsed['merge'] == 'true') {
-          print('Preparing to merge PR...');
-          var merged = false;
+          if (exitCode != 0) {
+            logs.add('');
+            logs.add('Analysis failed!');
+          } else if (parsed['merge'] == 'true') {
+            print('Preparing to merge PR...');
+            var merged = false;
 
-          var endBy =
-              DateTime.now().millisecondsSinceEpoch + timeout.inMilliseconds;
-          while (!merged) {
-            await Future.delayed(const Duration(seconds: 30));
+            var endBy =
+                DateTime.now().millisecondsSinceEpoch + timeout.inMilliseconds;
+            while (!merged) {
+              await Future.delayed(const Duration(seconds: 30));
 
-            print('Scanning for running status checks...');
-            var checks = await gh.checks.checkRuns
-                .listCheckRunsForRef(
-                  slug,
-                  ref: pr.head!.sha!,
-                )
-                .toList();
+              print('Scanning for running status checks...');
+              var checks = await gh.checks.checkRuns
+                  .listCheckRunsForRef(
+                    slug,
+                    ref: pr.head!.sha!,
+                  )
+                  .toList();
 
-            var done = true;
-            for (var check in checks) {
-              if (check.status?.value == 'in_progress') {
-                done = false;
-              }
-            }
-
-            if (done) {
-              print('Status checks complete...');
+              var done = true;
               for (var check in checks) {
-                if (check.conclusion.value != 'success') {
-                  throw Exception('Status check(s) did not pass');
+                if (check.status?.value == 'in_progress') {
+                  done = false;
                 }
               }
 
-              var mergeResult = await gh.pullRequests.merge(
-                slug,
-                pr.number!,
-                message: 'Automated Merge',
-              );
+              if (done) {
+                print('Status checks complete...');
+                for (var check in checks) {
+                  if (check.conclusion.value != 'success') {
+                    throw Exception('Status check(s) did not pass');
+                  }
+                }
 
-              if (mergeResult.merged != true) {
-                throw Exception('Error merging PR');
+                var mergeResult = await gh.pullRequests.merge(
+                  slug,
+                  pr.number!,
+                  message: 'Automated Merge',
+                );
+
+                if (mergeResult.merged != true) {
+                  throw Exception('Error merging PR');
+                }
+
+                print('PR merged');
+                merged = true;
+
+                await Process.runSync('git', [
+                  'push',
+                  'origin',
+                  '--delete',
+                  branchName,
+                ]);
+              } else if (DateTime.now().millisecondsSinceEpoch > endBy) {
+                throw Exception('PR Timeout!!!');
+              } else {
+                print('PR not mergable, waiting...');
               }
-
-              print('PR merged');
-              merged = true;
-
-              await Process.runSync('git', [
-                'push',
-                'origin',
-                '--delete',
-                branchName,
-              ]);
-            } else if (DateTime.now().millisecondsSinceEpoch > endBy) {
-              throw Exception('PR Timeout!!!');
-            } else {
-              print('PR not mergable, waiting...');
             }
           }
         }

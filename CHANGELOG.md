@@ -1,3 +1,8 @@
+## [1.0.8] - May, 30th, 2022
+
+* Bug fix for when there are no changes
+
+
 ## [1.0.7+2] - May, 30, 2022
 
 * Automated dependency updates

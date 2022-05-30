@@ -2,7 +2,7 @@ name: Automated Dependencies Updater
 
 on:
   schedule:
-    - cron: "0 0 * * 0"
+    - cron: "0 1 * * 2"
 
 jobs:
   build:
@@ -10,7 +10,7 @@ jobs:
 
     steps:
       - name: Dependencies
-        uses: peiffer-innovations/action-dart-dependency-updater@v1.0.7
+        uses: peiffer-innovations/action-dart-dependency-updater@v1.0.8
         with:
           merge: true
           pull_request: true
