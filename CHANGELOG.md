@@ -1,3 +1,8 @@
+## [1.0.18+1] - May, 31, 2022
+
+* Automated dependency updates
+
+
 ## [1.0.18] - May, 30th, 2022
 
 * Bug fix for when there are no changes
@@ -16,6 +21,7 @@
 ## [1.0.7] - May 29th, 2022
 
 * Initial release
+
 
 
 
