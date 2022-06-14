@@ -15,4 +15,5 @@ jobs:
       - uses: technote-space/toc-generator@v4
         with:
           COMMIT_MESSAGE: "[actions skip]: TOC"
+          GITHUB_TOKEN: ${{ secrets.REPO_TOKEN }}
           TARGET_PATHS: README.md

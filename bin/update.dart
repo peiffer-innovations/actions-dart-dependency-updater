@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:args/args.dart';
@@ -283,7 +284,12 @@ ${logs.join('\n')}
           print('Status checks complete...');
           for (var check in checks) {
             if (check.conclusion.value != 'success') {
-              throw Exception('Status check(s) did not pass');
+              throw Exception('''
+Status check(s) did not pass: ${check.conclusion}
+
+Details: 
+${JsonEncoder.withIndent('  ').convert(check.toJson())}
+''');
             }
           }
 
@@ -375,7 +381,7 @@ Future<bool> _updateDependencies({
     var changelog = File('$path/CHANGELOG.md');
     if (changelog.existsSync()) {
       var cl = changelog.readAsStringSync();
-      var df = DateFormat('MMMM, d, yyyy');
+      var df = DateFormat('MMMM d, yyyy');
 
       cl = '''
 ## [$versionString] - ${df.format(DateTime.now())}
