@@ -1,5 +1,10 @@
 # actions_dart_dependency_updater
 
+<!-- START doctoc -->
+<!-- END doctoc -->
+
+## Introduction
+
 Updates the dependencies of a Dart / Flutter repo automatically and optionally creates and merges the PR associated with the changes if all status checks on the PR are successful.
 
 ## Inputs
