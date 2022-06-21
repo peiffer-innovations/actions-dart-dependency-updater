@@ -1,3 +1,8 @@
+## [1.0.19+1] - June 21, 2022
+
+* Automated dependency updates
+
+
 ## [1.0.19] - June 14th, 2022
 
 * Adding more details on failure
@@ -26,6 +31,7 @@
 ## [1.0.7] - May 29th, 2022
 
 * Initial release
+
 
 
 
