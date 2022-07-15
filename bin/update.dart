@@ -275,7 +275,8 @@ ${logs.join('\n')}
 
         var done = true;
         for (var check in checks) {
-          if (check.status?.value == 'in_progress') {
+          if (check.status?.value == 'in_progress' ||
+              check.status?.value == 'queued') {
             done = false;
           }
         }
