@@ -1,3 +1,8 @@
+## [1.0.20+1] - August 2, 2022
+
+* Automated dependency updates
+
+
 ## [1.0.20] - July 14th, 2022
 
 * Fix for pending status
@@ -46,6 +51,7 @@
 ## [1.0.7] - May 29th, 2022
 
 * Initial release
+
 
 
 
