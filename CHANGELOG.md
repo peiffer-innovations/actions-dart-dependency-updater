@@ -1,3 +1,8 @@
+## [1.0.21] - October 11th, 2022
+
+* Minor Log updates
+
+
 ## [1.0.20+5] - October 11, 2022
 
 * Automated dependency updates
