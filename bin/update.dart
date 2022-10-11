@@ -332,6 +332,7 @@ Future<bool> _updateDependencies({
   var hasUpdates = false;
   var scanner = VersionScanner();
   var pubspec = File('$path/pubspec.yaml');
+  print('Updating pubspec: [${pubspec.path}]');
 
   var yaml = loadYamlDocument(pubspec.readAsStringSync());
 
