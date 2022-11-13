@@ -1,3 +1,8 @@
+## [1.0.22] - November 12th, 2022
+
+* Workflow
+
+
 ## [1.0.21+4] - November 8, 2022
 
 * Automated dependency updates
