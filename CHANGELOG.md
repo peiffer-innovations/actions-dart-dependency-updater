@@ -1,4 +1,4 @@
-## [1.0.22] - November 12th, 2022
+## [1.0.22+1] - November 12th, 2022
 
 * Workflow
 
