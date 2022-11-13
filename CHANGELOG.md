@@ -1,3 +1,8 @@
+## [1.0.22] - November 12th, 2022
+
+* Workflow updates
+
+
 ## [1.0.21] - October 11th, 2022
 
 * Minor Log updates
