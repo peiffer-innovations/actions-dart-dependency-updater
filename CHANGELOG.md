@@ -1,3 +1,8 @@
+## [1.0.22+2] - November 15, 2022
+
+* Automated dependency updates
+
+
 ## [1.0.22+1] - November 12th, 2022
 
 * Workflow
@@ -101,6 +106,7 @@
 ## [1.0.7] - May 29th, 2022
 
 * Initial release
+
 
 
 
