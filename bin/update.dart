@@ -24,12 +24,12 @@ Future<void> main(List<String>? args) async {
     }
   });
 
-  var logs = <String>[];
+  final logs = <String>[];
 
-  var exitCode = 0;
+  final exitCode = 0;
 
   try {
-    var parser = ArgParser();
+    final parser = ArgParser();
     parser.addFlag(
       'dry-run',
     );
@@ -63,15 +63,15 @@ Future<void> main(List<String>? args) async {
       'token',
     );
 
-    var parsed = parser.parse(args ?? []);
+    final parsed = parser.parse(args ?? []);
 
-    var paths = parsed['paths'].split(',');
+    final paths = parsed['paths'].split(',');
     var hasUpdates = false;
 
-    var timeout = Duration(
+    final timeout = Duration(
       minutes: JsonClass.parseInt(parsed['timeout']) ?? 10,
     );
-    var dryRun = parsed['dry-run'] == true;
+    final dryRun = parsed['dry-run'] == true;
 
     for (var path in paths) {
       hasUpdates = await _updateDependencies(
@@ -128,31 +128,31 @@ Future<void> _processGit({
     RepositorySlug? slug;
 
     if (repository != null) {
-      var repo = repository;
+      final repo = repository;
 
       slug = RepositorySlug.full(repo);
       print('Discovered CLI SLUG: $repo');
     } else if (Platform.environment['GITHUB_ACTION_REPOSITORY']?.isNotEmpty ==
         true) {
-      var repo = Platform.environment['GITHUB_ACTION_REPOSITORY']!;
+      final repo = Platform.environment['GITHUB_ACTION_REPOSITORY']!;
 
       slug = RepositorySlug.full(repo);
       print('Discovered ENV SLUG: $repo');
     } else {
-      var ghResult = Process.runSync(
+      final ghResult = Process.runSync(
         'git',
         ['remote', 'show', 'origin'],
       );
-      var ghOutput = ghResult.stdout;
+      final ghOutput = ghResult.stdout;
 
-      var regex = RegExp(
+      final regex = RegExp(
         r'Push[^:]*:[^:]*:(?<org>[^\/]*)\/(?<repo>[^\n\.\/]*)',
       );
-      var matches = regex.allMatches(ghOutput.toString());
+      final matches = regex.allMatches(ghOutput.toString());
 
       for (var match in matches) {
-        var org = match.namedGroup('org');
-        var repo = match.namedGroup('repo');
+        final org = match.namedGroup('org');
+        final repo = match.namedGroup('repo');
 
         if (org != null && repo != null) {
           slug = RepositorySlug(org, repo);
@@ -167,7 +167,7 @@ Future<void> _processGit({
       throw Exception('Unable to determine GitHub SLUG');
     }
 
-    var branchName = 'dart_update_${DateTime.now().millisecondsSinceEpoch}';
+    final branchName = 'dart_update_${DateTime.now().millisecondsSinceEpoch}';
 
     var ghResult = Process.runSync(
       'git',
@@ -224,7 +224,7 @@ Future<void> _processGit({
       throw Exception('FormatException: Option token is mandatory.');
     }
 
-    var gh = GitHub(
+    final gh = GitHub(
       auth: Authentication.withToken(token),
     );
 
@@ -233,7 +233,7 @@ Creating PR:
   * From Branch: $branchName
   * To Branch:   $branch
 ''');
-    var pr = await gh.pullRequests.create(
+    final pr = await gh.pullRequests.create(
       slug,
       CreatePullRequest(
         'BOT: Dart Dependency Updater',
@@ -260,13 +260,13 @@ ${logs.join('\n')}
       print('Preparing to merge PR...');
       var merged = false;
 
-      var endBy =
+      final endBy =
           DateTime.now().millisecondsSinceEpoch + timeout.inMilliseconds;
       while (!merged) {
         await Future.delayed(const Duration(seconds: 30));
 
         print('Scanning for running status checks...');
-        var checks = await gh.checks.checkRuns
+        final checks = await gh.checks.checkRuns
             .listCheckRunsForRef(
               slug,
               ref: pr.head!.sha!,
@@ -289,12 +289,12 @@ ${logs.join('\n')}
 Status check(s) did not pass: ${check.conclusion}
 
 Details: 
-${JsonEncoder.withIndent('  ').convert(check.toJson())}
+${const JsonEncoder.withIndent('  ').convert(check.toJson())}
 ''');
             }
           }
 
-          var mergeResult = await gh.pullRequests.merge(
+          final mergeResult = await gh.pullRequests.merge(
             slug,
             pr.number!,
             message: 'Automated Merge',
@@ -330,13 +330,13 @@ Future<bool> _updateDependencies({
   required Duration timeout,
 }) async {
   var hasUpdates = false;
-  var scanner = VersionScanner();
-  var pubspec = File('$path/pubspec.yaml');
+  final scanner = VersionScanner();
+  final pubspec = File('$path/pubspec.yaml');
   print('Updating pubspec: [${pubspec.path}]');
 
-  var yaml = loadYamlDocument(pubspec.readAsStringSync());
+  final yaml = loadYamlDocument(pubspec.readAsStringSync());
 
-  var results = await scanner.scan(yaml);
+  final results = await scanner.scan(yaml);
 
   if (results.dependencies.isNotEmpty) {
     logs.add('');
@@ -361,8 +361,8 @@ Future<bool> _updateDependencies({
   }
 
   if (hasUpdates) {
-    var contents = Map<String, dynamic>.from(yaml.contents.value);
-    var version = Version.parse(contents['version']);
+    final contents = Map<String, dynamic>.from(yaml.contents.value);
+    final version = Version.parse(contents['version']);
 
     if (version.build.length > 1) {
       throw Exception(
@@ -376,14 +376,14 @@ Future<bool> _updateDependencies({
     }
     buildNumber++;
 
-    var versionString =
+    final versionString =
         '${version.major}.${version.minor}.${version.patch}+$buildNumber';
     contents['version'] = versionString;
 
-    var changelog = File('$path/CHANGELOG.md');
+    final changelog = File('$path/CHANGELOG.md');
     if (changelog.existsSync()) {
       var cl = changelog.readAsStringSync();
-      var df = DateFormat('MMMM d, yyyy');
+      final df = DateFormat('MMMM d, yyyy');
 
       cl = '''
 ## [$versionString] - ${df.format(DateTime.now())}
@@ -400,7 +400,7 @@ $cl
     var flutter = false;
 
     if (results.dependencies.isNotEmpty) {
-      var deps = Map<String, dynamic>.from(contents['dependencies']);
+      final deps = Map<String, dynamic>.from(contents['dependencies']);
       flutter = flutter || deps.containsKey('flutter');
       for (var dep in results.dependencies) {
         deps[dep.package] = '^${dep.newVersion}';
@@ -409,7 +409,7 @@ $cl
     }
 
     if (results.devDependencies.isNotEmpty) {
-      var deps = Map<String, dynamic>.from(contents['dev_dependencies']);
+      final deps = Map<String, dynamic>.from(contents['dev_dependencies']);
       flutter = flutter || deps.containsKey('flutter');
       flutter = flutter || deps.containsKey('flutter_test');
       for (var dep in results.devDependencies) {
@@ -419,14 +419,14 @@ $cl
     }
     logs.add('');
 
-    var lines = YAMLWriter().write(contents).split('\n');
+    final lines = YAMLWriter().write(contents).split('\n');
 
-    var output = <String>[];
+    final output = <String>[];
     for (var i = 0; i < lines.length; i++) {
-      var line = lines[i];
+      final line = lines[i];
       if (line.trim().isNotEmpty) {
         if (!line.startsWith(' ')) {
-          var nextLine = i + 1 < lines.length ? lines[i + 1] : '';
+          final nextLine = i + 1 < lines.length ? lines[i + 1] : '';
 
           if (nextLine.startsWith(' ')) {
             output.add('');
@@ -440,7 +440,7 @@ $cl
     pubspec.writeAsStringSync(output.join('\n'));
 
     Future<ProcessResult> process;
-    var lock = File('$path/pubspec.lock');
+    final lock = File('$path/pubspec.lock');
     if (lock.existsSync()) {
       lock.deleteSync();
     }
@@ -462,9 +462,9 @@ $cl
     }
 
     Completer? completer = Completer();
-    var cFuture = completer.future;
+    final cFuture = completer.future;
     late ProcessResult processResult;
-    var timer = Timer(
+    final timer = Timer(
       timeout,
       () {
         print('TIMEOUT!');
@@ -472,7 +472,7 @@ $cl
         completer = null;
       },
     );
-    var future = Future.microtask(() async {
+    final future = Future.microtask(() async {
       try {
         processResult = await process;
         print('Done updating dependencies');

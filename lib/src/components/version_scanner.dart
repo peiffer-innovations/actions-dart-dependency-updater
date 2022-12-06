@@ -8,14 +8,14 @@ class VersionScanner {
   final Logger _logger = Logger('VersionScanner');
 
   Future<UpdateResult> scan(YamlDocument pubspec) async {
-    var yaml = pubspec.contents.value;
+    final yaml = pubspec.contents.value;
 
-    var result = UpdateResult();
+    final result = UpdateResult();
     var deps = yaml['dependencies'];
 
-    var ignoreUpdates = List<String>.from(yaml['ignore_updates'] ?? []);
+    final ignoreUpdates = List<String>.from(yaml['ignore_updates'] ?? []);
     if (deps is Map) {
-      var updated = await _updateDependencies(
+      final updated = await _updateDependencies(
         Map<String, dynamic>.from(deps),
         ignoreUpdates,
       );
@@ -24,7 +24,7 @@ class VersionScanner {
 
     deps = yaml['dev_dependencies'];
     if (deps is Map) {
-      var updated = await _updateDependencies(
+      final updated = await _updateDependencies(
         Map<String, dynamic>.from(deps),
         ignoreUpdates,
       );
@@ -38,17 +38,17 @@ class VersionScanner {
     Map<String, dynamic> deps,
     List<String> ignore,
   ) async {
-    var updated = <Dependency>[];
+    final updated = <Dependency>[];
 
-    var client = PubClient();
+    final client = PubClient();
     for (var entry in deps.entries) {
-      var ver = entry.value;
+      final ver = entry.value;
       if (ignore.contains(entry.key)) {
         _logger.info('[ignoring]: ${entry.key}');
       } else if (ver is String && ver.startsWith('^')) {
-        var versionConstraint = Version.parse(ver.substring(1));
+        final versionConstraint = Version.parse(ver.substring(1));
 
-        var package = await client.packageInfo(entry.key);
+        final package = await client.packageInfo(entry.key);
 
         if (versionConstraint.isPreRelease) {
           _logger.info('[pre-release]: ${entry.key}');
