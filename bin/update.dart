@@ -240,7 +240,7 @@ Creating PR:
         branchName,
         branch,
         body: '''
-PR created automatically via: https://github.com/peiffer-innovations/actions-dart-dependency-updater
+PR created automatically
 
 ${logs.join('\n')}
 ''',
