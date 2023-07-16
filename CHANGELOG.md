@@ -1,6 +1,6 @@
-## [1.0.22+23] - July 16, 2023
+## [1.1.0] - July 16th, 2023
 
-* Automated dependency updates
+* Brought in `pub_api_client` to be able to depend on http 1.1.0
 
 
 ## [1.0.22+22] - May 16, 2023

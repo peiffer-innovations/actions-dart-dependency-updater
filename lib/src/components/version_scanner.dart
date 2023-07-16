@@ -1,6 +1,6 @@
 import 'package:dart_dependency_updater/dart_dependency_updater.dart';
+import 'package:dart_dependency_updater/src/pub_api_client/pub_api_client.dart';
 import 'package:logging/logging.dart';
-import 'package:pub_api_client/pub_api_client.dart';
 import 'package:pub_semver/pub_semver.dart';
 import 'package:yaml/yaml.dart';
 
