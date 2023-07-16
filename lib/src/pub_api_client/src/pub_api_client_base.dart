@@ -22,11 +22,6 @@ typedef FetchFunction = Future<Map<String, dynamic>> Function(String url);
 
 /// Pub API Client
 class PubClient {
-  final Endpoint endpoint;
-  final String? pubUrl;
-  final http.Client? client;
-  final Credentials? credentials;
-  late final PubApiHttpClient _client;
   PubClient({
     this.pubUrl,
     this.credentials,
@@ -48,6 +43,11 @@ class PubClient {
       // credentials: credentials,
     );
   }
+  final Endpoint endpoint;
+  final String? pubUrl;
+  final http.Client? client;
+  final Credentials? credentials;
+  late final PubApiHttpClient _client;
 
   Future<Map<String, dynamic>> _fetch(String url) async {
     final response = await _client.get(Uri.parse(url));

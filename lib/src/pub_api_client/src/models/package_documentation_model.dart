@@ -1,27 +1,16 @@
 import 'dart:convert';
 
 import 'package:collection/collection.dart';
+import 'package:meta/meta.dart';
 
 /// Package Documentation Model
-
+@immutable
 class PackageDocumentation {
-  final String name;
-
-  final String latestStableVersion;
-
-  final List<PackageDocumentationVersion> versions;
-
   PackageDocumentation({
     required this.name,
     required this.latestStableVersion,
     this.versions = const [],
   });
-
-  Map<String, dynamic> toMap() => {
-        'name': name,
-        'latestStableVersion': latestStableVersion,
-        'versions': versions.map((x) => x.toMap()).toList(),
-      };
 
   factory PackageDocumentation.fromMap(Map<String, dynamic> map) {
     final versionMap = map['versions'] as List<dynamic>? ?? [];
@@ -35,10 +24,21 @@ class PackageDocumentation {
           .toList(),
     );
   }
-  String toJson() => json.encode(toMap());
 
   factory PackageDocumentation.fromJson(String source) =>
       PackageDocumentation.fromMap(json.decode(source) as Map<String, dynamic>);
+  final String name;
+
+  final String latestStableVersion;
+
+  final List<PackageDocumentationVersion> versions;
+
+  Map<String, dynamic> toMap() => {
+        'name': name,
+        'latestStableVersion': latestStableVersion,
+        'versions': versions.map((x) => x.toMap()).toList(),
+      };
+  String toJson() => json.encode(toMap());
 
   @override
   bool operator ==(Object other) {
@@ -57,22 +57,13 @@ class PackageDocumentation {
 }
 
 /// Package Documentation Version Model
-
+@immutable
 class PackageDocumentationVersion {
-  final String version;
-  final String status;
-  final bool hasDocumentation;
   PackageDocumentationVersion({
     required this.version,
     required this.status,
     required this.hasDocumentation,
   });
-
-  Map<String, dynamic> toMap() => {
-        'version': version,
-        'status': status,
-        'hasDocumentation': hasDocumentation,
-      };
 
   factory PackageDocumentationVersion.fromMap(Map<String, dynamic> map) =>
       PackageDocumentationVersion(
@@ -81,11 +72,20 @@ class PackageDocumentationVersion {
         hasDocumentation: map['hasDocumentation'] as bool? ?? false,
       );
 
-  String toJson() => json.encode(toMap());
-
   factory PackageDocumentationVersion.fromJson(String source) =>
       PackageDocumentationVersion.fromMap(
           json.decode(source) as Map<String, dynamic>);
+  final String version;
+  final String status;
+  final bool hasDocumentation;
+
+  Map<String, dynamic> toMap() => {
+        'version': version,
+        'status': status,
+        'hasDocumentation': hasDocumentation,
+      };
+
+  String toJson() => json.encode(toMap());
 
   @override
   bool operator ==(Object other) {

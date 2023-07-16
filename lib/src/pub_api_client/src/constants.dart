@@ -83,8 +83,8 @@ String get _home {
 }
 
 class EnvironmentNotFoundException implements Exception {
-  final String message;
   EnvironmentNotFoundException(this.message);
+  final String message;
   @override
   String toString() => message;
 }

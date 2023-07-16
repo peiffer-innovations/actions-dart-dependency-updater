@@ -69,7 +69,7 @@ Future<void> main(List<String>? args) async {
     var hasUpdates = false;
 
     final timeout = Duration(
-      minutes: JsonClass.parseInt(parsed['timeout']) ?? 10,
+      minutes: JsonClass.maybeParseInt(parsed['timeout']) ?? 10,
     );
     final dryRun = parsed['dry-run'] == true;
 
@@ -372,7 +372,7 @@ Future<bool> _updateDependencies({
 
     var buildNumber = 0;
     if (version.build.isNotEmpty) {
-      buildNumber = JsonClass.parseInt(version.build.first) ?? 0;
+      buildNumber = JsonClass.maybeParseInt(version.build.first) ?? 0;
     }
     buildNumber++;
 

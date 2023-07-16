@@ -1,12 +1,9 @@
 import 'package:collection/collection.dart';
+import 'package:meta/meta.dart';
 
 /// Package Score Model
+@immutable
 class PackageScore {
-  final int? grantedPoints;
-  final int? maxPoints;
-  final int likeCount;
-  final double? popularityScore;
-  final DateTime lastUpdated;
   const PackageScore({
     required this.grantedPoints,
     required this.maxPoints,
@@ -15,14 +12,6 @@ class PackageScore {
     required this.lastUpdated,
   });
 
-  Map<String, dynamic> toMap() => {
-        'grantedPoints': grantedPoints,
-        'maxPoints': maxPoints,
-        'likeCount': likeCount,
-        'popularityScore': popularityScore,
-        'lastUpdated': lastUpdated.millisecondsSinceEpoch,
-      };
-
   factory PackageScore.fromMap(Map<String, dynamic> map) => PackageScore(
         grantedPoints: map['grantedPoints'] as int? ?? 0,
         maxPoints: map['maxPoints'] as int? ?? 0,
@@ -30,6 +19,19 @@ class PackageScore {
         popularityScore: map['popularityScore'] as double? ?? 0.0,
         lastUpdated: DateTime.parse(map['lastUpdated'] as String? ?? ''),
       );
+  final int? grantedPoints;
+  final int? maxPoints;
+  final int likeCount;
+  final double? popularityScore;
+  final DateTime lastUpdated;
+
+  Map<String, dynamic> toMap() => {
+        'grantedPoints': grantedPoints,
+        'maxPoints': maxPoints,
+        'likeCount': likeCount,
+        'popularityScore': popularityScore,
+        'lastUpdated': lastUpdated.millisecondsSinceEpoch,
+      };
 
   @override
   bool operator ==(Object other) {
@@ -53,16 +55,8 @@ class PackageScore {
 }
 
 /// Package Score Card Model
+@immutable
 class PackageScoreCard {
-  final String packageName;
-  final String packageVersion;
-  final String runtimeVersion;
-  final DateTime updated;
-  final DateTime packageCreated;
-  final DateTime packageVersionCreated;
-  final List<String> derivedTags;
-  final List<String> flags;
-  final List<String> reportTypes;
   const PackageScoreCard({
     required this.packageName,
     required this.packageVersion,
@@ -74,18 +68,6 @@ class PackageScoreCard {
     this.flags = const [],
     this.reportTypes = const [],
   });
-
-  Map<String, dynamic> toMap() => {
-        'packageName': packageName,
-        'packageVersion': packageVersion,
-        'runtimeVersion': runtimeVersion,
-        'updated': updated.millisecondsSinceEpoch,
-        'packageCreated': packageCreated.millisecondsSinceEpoch,
-        'packageVersionCreated': packageVersionCreated.millisecondsSinceEpoch,
-        'derivedTags': derivedTags,
-        'flags': flags,
-        'reportTypes': reportTypes,
-      };
 
   factory PackageScoreCard.fromMap(Map<String, dynamic> map) =>
       PackageScoreCard(
@@ -102,6 +84,27 @@ class PackageScoreCard {
         reportTypes:
             List<String>.from(map['reportTypes'] as List<dynamic>? ?? []),
       );
+  final String packageName;
+  final String packageVersion;
+  final String runtimeVersion;
+  final DateTime updated;
+  final DateTime packageCreated;
+  final DateTime packageVersionCreated;
+  final List<String> derivedTags;
+  final List<String> flags;
+  final List<String> reportTypes;
+
+  Map<String, dynamic> toMap() => {
+        'packageName': packageName,
+        'packageVersion': packageVersion,
+        'runtimeVersion': runtimeVersion,
+        'updated': updated.millisecondsSinceEpoch,
+        'packageCreated': packageCreated.millisecondsSinceEpoch,
+        'packageVersionCreated': packageVersionCreated.millisecondsSinceEpoch,
+        'derivedTags': derivedTags,
+        'flags': flags,
+        'reportTypes': reportTypes,
+      };
 
   @override
   bool operator ==(Object other) {

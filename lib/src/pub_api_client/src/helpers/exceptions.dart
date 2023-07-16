@@ -4,9 +4,8 @@ import 'dart:io';
 import 'package:http/http.dart';
 
 class PubClientException implements Exception {
-  final Response _response;
-
   PubClientException(this._response);
+  final Response _response;
 
   @override
   String toString() {

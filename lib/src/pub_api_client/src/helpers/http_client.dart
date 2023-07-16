@@ -5,9 +5,9 @@ import 'package:http/http.dart' as http;
 import '../version.dart';
 
 class PubApiHttpClient extends http.BaseClient {
-  final http.Client _inner;
   // final Credentials? credentials;
   PubApiHttpClient(this._inner);
+  final http.Client _inner;
 
   @override
   Future<http.StreamedResponse> send(http.BaseRequest request) {

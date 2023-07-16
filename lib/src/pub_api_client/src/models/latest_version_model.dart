@@ -1,17 +1,19 @@
+import 'package:meta/meta.dart';
+
 import 'pub_package_model.dart';
 
 /// Latest Version update for package
+@immutable
 class LatestVersion {
-  final bool needUpdate;
-  final String latestVersion;
-  final PubPackage packageInfo;
-
   /// Constructor
   LatestVersion({
     required this.needUpdate,
     required this.latestVersion,
     required this.packageInfo,
   });
+  final bool needUpdate;
+  final String latestVersion;
+  final PubPackage packageInfo;
 
   @override
   bool operator ==(Object other) {
