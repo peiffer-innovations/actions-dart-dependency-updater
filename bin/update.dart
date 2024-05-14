@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
@@ -25,8 +27,6 @@ Future<void> main(List<String>? args) async {
   });
 
   final logs = <String>[];
-
-  final exitCode = 0;
 
   try {
     final parser = ArgParser();
@@ -69,7 +69,7 @@ Future<void> main(List<String>? args) async {
     var hasUpdates = false;
 
     final timeout = Duration(
-      minutes: JsonClass.parseInt(parsed['timeout']) ?? 10,
+      minutes: JsonClass.maybeParseInt(parsed['timeout']) ?? 10,
     );
     final dryRun = parsed['dry-run'] == true;
 
@@ -103,7 +103,7 @@ Future<void> main(List<String>? args) async {
       logs.add('No updates found, process is complete');
     }
     print(logs.join('\n'));
-    exit(exitCode);
+    exit(0);
   } catch (e, stack) {
     logs.add('$e');
     logs.add('$stack');
@@ -307,7 +307,7 @@ ${const JsonEncoder.withIndent('  ').convert(check.toJson())}
           print('PR merged');
           merged = true;
 
-          await Process.runSync('git', [
+          Process.runSync('git', [
             'push',
             'origin',
             '--delete',
@@ -372,7 +372,7 @@ Future<bool> _updateDependencies({
 
     var buildNumber = 0;
     if (version.build.isNotEmpty) {
-      buildNumber = JsonClass.parseInt(version.build.first) ?? 0;
+      buildNumber = JsonClass.maybeParseInt(version.build.first) ?? 0;
     }
     buildNumber++;
 
@@ -392,7 +392,8 @@ Future<bool> _updateDependencies({
 
 
 $cl
-''';
+'''
+          .trim();
 
       changelog.writeAsStringSync(cl);
     }
@@ -419,7 +420,7 @@ $cl
     }
     logs.add('');
 
-    final lines = YAMLWriter().write(contents).split('\n');
+    final lines = YamlWriter().write(contents).split('\n');
 
     final output = <String>[];
     for (var i = 0; i < lines.length; i++) {
